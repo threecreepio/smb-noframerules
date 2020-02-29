@@ -16726,6 +16726,7 @@ BrickShatterEnvData:
 ;-------------------------------------------------------------------------------------
 ;INTERRUPT VECTORS
 
+.res $FFFA - *, $FF
       .word NonMaskableInterrupt
       .word Start
       .word $fff0  ;unused
