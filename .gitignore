@@ -1,3 +1,5 @@
 *.o
 *.nes
 *.dbg
+*.zip
+*.ips
