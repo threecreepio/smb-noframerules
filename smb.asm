@@ -93,13 +93,13 @@ FrenzyEnemyTimer      = $078f
 BowserFireBreathTimer = $0790
 StompTimer            = $0791
 AirBubbleTimer        = $0792
+ScreenTimer           = $0793
+WorldEndTimer         = $0794
 ScrollIntervalTimer   = $0795
 EnemyIntervalTimer    = $0796
 BrickCoinTimer        = $079d
 InjuryTimer           = $079e
 StarInvincibleTimer   = $079f
-ScreenTimer           = $07a0
-WorldEndTimer         = $07a1
 DemoTimer             = $07a2
 
 Sprite_Data           = $0200
@@ -783,7 +783,7 @@ InitBuffer:    ldx VRAM_Buffer_Offset,y
                beq DecTimers             ;all frame and interval timers
                dec TimerControl
                bne NoDecTimers
-DecTimers:     ldx #$14                  ;load end offset for end of frame timers
+DecTimers:     ldx #$15                  ;load end offset for end of frame timers
                dec IntervalTimerControl  ;decrement interval timer control,
                bpl DecTimersLoop         ;if not expired, only frame timers will decrement
                lda #$14
@@ -1216,9 +1216,9 @@ IncMsgCounter: lda SecondaryMsgCounter
                lda PrimaryMsgCounter
                adc #$00                      ;add carry to primary message counter
                sta PrimaryMsgCounter
-               cmp #$07                      ;check primary counter one more time
+               cmp #$04                      ;check primary counter one more time
 SetEndTimer:   bcc ExitMsgs                  ;if not reached value yet, branch to leave
-               lda #$06
+               lda #$78
                sta WorldEndTimer             ;otherwise set world end timer
 IncModeTask_A: inc OperMode_Task             ;move onto next task in mode
 ExitMsgs:      rts                           ;leave
@@ -1553,7 +1553,7 @@ OutputInter:   jsr WriteGameText
                lda #$00
                sta DisableScreenFlag        ;reenable screen output
                rts
-GameOverInter: lda #$12                     ;set screen timer
+GameOverInter: lda #$FF                     ;set screen timer
                sta ScreenTimer
                lda #$03                     ;output game over screen to buffer
                jsr WriteGameText
@@ -1779,7 +1779,7 @@ ResetSpritesAndScreenTimer:
          jsr MoveAllSpritesOffscreen ;otherwise reset sprites now
 
 ResetScreenTimer:
-         lda #$07                    ;reset timer again
+         lda #$8C                    ;reset timer again
          sta ScreenTimer
          inc ScreenRoutineTask       ;move onto next task
 NoReset: rts
@@ -10551,8 +10551,8 @@ DSFLoop: lda Enemy_Rel_YPos         ;get relative vertical coordinate
 
 DrawFlagSetTimer:
       jsr DrawStarFlag          ;do sub to draw star flag
-      lda #$06
-      sta EnemyIntervalTimer,x  ;set interval timer here
+      lda #$78
+      sta ScreenTimer  ;set interval timer here
 
 IncrementSFTask2:
       inc StarFlagTaskControl   ;move onto next task
@@ -10560,7 +10560,7 @@ IncrementSFTask2:
 
 DelayToAreaEnd:
       jsr DrawStarFlag          ;do sub to draw star flag
-      lda EnemyIntervalTimer,x  ;if interval timer set in previous task
+      lda ScreenTimer  ;if interval timer set in previous task
       bne StarFlagExit2         ;not yet expired, branch to leave
       lda EventMusicBuffer      ;if event music buffer empty,
       beq IncrementSFTask2      ;branch to increment task
